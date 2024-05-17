@@ -62,3 +62,4 @@ real_tokio = { git = "ssh://git@github.com/iotaledger/tokio-madsim-fork.git", br
 bytes = { version = "1.7" }
 futures = { version = "0.3", features = ["async-await"] }
 mio = { version = "1.0" }
+libc = "0.2"
