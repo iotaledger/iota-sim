@@ -2,10 +2,10 @@
 name = "msim-macros"
 version = "0.1.0"
 edition = "2021"
-authors = ["Runji Wang <wangrunji0408@163.com>", "Mysten Labs <build@mystenlabs.com>"]
+authors = ["IOTA Stiftung"]
 description = "Mysten sim's proc-macro."
-homepage = "https://github.com/MystenLabs/mysten-simulator"
-repository = "https://github.com/MystenLabs/mysten-simulator"
+homepage = "https://www.iota.org/"
+repository = "https://github.com/iotaledger/iota-sim"
 license = "Apache-2.0"
 categories = ["asynchronous"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

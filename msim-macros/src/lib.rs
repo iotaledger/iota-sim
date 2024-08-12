@@ -1,19 +1,10 @@
 //! Macros for use with Madsim
 
-mod request;
 mod service;
 
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
-use syn::DeriveInput;
-
-#[proc_macro_derive(Request, attributes(rtype))]
-pub fn message_derive_rtype(input: TokenStream) -> TokenStream {
-    let ast: DeriveInput = syn::parse(input).unwrap();
-
-    request::expand(&ast).into()
-}
 
 #[proc_macro_attribute]
 pub fn service(args: TokenStream, input: TokenStream) -> TokenStream {

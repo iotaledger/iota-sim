@@ -11,8 +11,6 @@ use futures::future::poll_fn;
 use futures::stream::{FuturesUnordered, Stream};
 
 use crate::runtime::Handle;
-#[cfg(tokio_unstable)]
-use crate::task::Id;
 use crate::task::{AbortHandle, JoinError, JoinHandle};
 
 use tokio::task::LocalSet;

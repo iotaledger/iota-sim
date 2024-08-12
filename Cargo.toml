@@ -6,6 +6,5 @@ members = [
     "mocked-crates/futures-timer",
 ]
 exclude = [
-    "tokio",
     "test-crates/jsonrpsee-test",
 ]

@@ -365,7 +365,7 @@ impl Handle {
 }
 
 /// Guard for entering handle
-pub struct EnterGuard(context::EnterGuard);
+pub struct EnterGuard(#[expect(unused)] context::EnterGuard);
 
 /// Builds a node with custom configurations.
 pub struct NodeBuilder<'a> {
@@ -429,7 +429,7 @@ impl<'a> NodeBuilder<'a> {
 
 /// Guard for entering a node context.
 #[must_use]
-pub struct NodeEnterGuard(TaskEnterGuard);
+pub struct NodeEnterGuard(#[expect(unused)] TaskEnterGuard);
 
 /// Handle to a node.
 #[derive(Clone)]

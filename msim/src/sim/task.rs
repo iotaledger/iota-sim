@@ -73,14 +73,14 @@ struct PanicWrapper {
     restart_after: Option<Duration>,
 }
 
-struct PanicHookGuard(Option<Box<dyn Fn(&std::panic::PanicInfo<'_>) + Sync + Send + 'static>>);
+struct PanicHookGuard(Option<Box<dyn Fn(&std::panic::PanicHookInfo<'_>) + Sync + Send + 'static>>);
 
 impl PanicHookGuard {
     fn new() -> Self {
         Self(Some(std::panic::take_hook()))
     }
 
-    fn call_hook(&self, info: &std::panic::PanicInfo<'_>) {
+    fn call_hook(&self, info: &std::panic::PanicHookInfo<'_>) {
         self.0.as_ref().unwrap()(info);
     }
 }

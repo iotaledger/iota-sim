@@ -76,7 +76,10 @@ impl Handle {
     }
 }
 
-pub struct EnterGuard<'a>(ms_runtime::EnterGuard, std::marker::PhantomData<&'a Handle>);
+pub struct EnterGuard<'a>(
+    #[expect(unused)] ms_runtime::EnterGuard,
+    std::marker::PhantomData<&'a Handle>,
+);
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub struct Id(u64);
