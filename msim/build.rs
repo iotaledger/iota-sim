@@ -1,4 +1,5 @@
 fn main() {
+    println!("cargo::rustc-check-cfg=cfg(msim)");
     #[cfg(target_os = "linux")]
     {
         println!("cargo:rerun-if-changed=src/sim/syscall.c");

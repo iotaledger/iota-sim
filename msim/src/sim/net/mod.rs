@@ -222,7 +222,7 @@ pub fn get_endpoint_from_socket(fd: libc::c_int) -> io::Result<Arc<Endpoint>> {
 }
 
 unsafe fn make_sockaddr(sock_addr: *const libc::sockaddr, addr_len: libc::socklen_t) -> SocketAddr {
-    socket2::SockAddr::init(|storage, len| {
+    socket2::SockAddr::try_init(|storage, len| {
         std::ptr::copy_nonoverlapping(
             sock_addr as *const u8,
             storage as *mut u8,
@@ -653,7 +653,7 @@ impl UDPMessage {
 }
 
 unsafe fn msg_hdr_to_socket(msg: &libc::msghdr) -> SocketAddr {
-    socket2::SockAddr::init(|storage, len| {
+    socket2::SockAddr::try_init(|storage, len| {
         std::ptr::copy_nonoverlapping(
             msg.msg_name as *const u8,
             storage as *mut u8,

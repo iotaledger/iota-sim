@@ -1,4 +1,4 @@
-# The Mysten Simulator
+# The IOTA Simulator
 
 **This is a fork of https://github.com/madsim-rs/madsim**
 
@@ -9,8 +9,8 @@ This fork modifies the original project to produce a drop-in replacement for tok
 
 1. Clone the tokio fork, add an upstream remote, and fetch
 
-        $ git clone git@github.com:MystenLabs/tokio-msim-fork.git
-        $ cd tokio-msim-fork
+        $ git clone git@github.com:MystenLabs/tokio-madsim-fork.git
+        $ cd tokio-madsim-fork
         $ git remote add upstream git@github.com:tokio-rs/tokio.git
         $ git fetch upstream --tags
 
@@ -37,13 +37,13 @@ This fork modifies the original project to produce a drop-in replacement for tok
 4. Now, in this repo
 
     1. Edit the version in `msim-tokio/Cargo.toml` to match the version we are upgrading to (`1.43.0` in this example).
-    2. Find all references to `https://github.com/MystenLabs/tokio-msim-fork.git` in Cargo.toml files in this repo and update the `rev` param to `FORK_COMMIT`.
+    2. Find all references to `https://github.com/iotaledger/tokio-madsim-fork.git` in Cargo.toml files in this repo and update the `rev` param to `FORK_COMMIT`.
 
 5. Now, in the sui repo, update the tokio version by editing Cargo.toml, or by running:
 
         $ cargo update -p tokio --precise 1.43.0
 
-6. Install simtest (if you already have it, skip this step): https://github.com/MystenLabs/sui/blob/main/scripts/simtest/install.sh
+6. Install simtest (if you already have it, skip this step): https://github.com/iotaledger/sui/blob/main/scripts/simtest/install.sh
 
 7. Test all the changes against your local msim repo - if there are build errors the rebasing may have gone wrong. Make sure to put the correct path for the LOCAL_MSIM_PATH variable.
         $ cd sui
