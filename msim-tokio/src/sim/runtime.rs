@@ -77,7 +77,7 @@ impl Handle {
 }
 
 pub struct EnterGuard<'a>(
-    #[expect(unused)] ms_runtime::EnterGuard,
+    #[allow(unused)] ms_runtime::EnterGuard,
     std::marker::PhantomData<&'a Handle>,
 );
 
