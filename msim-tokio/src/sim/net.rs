@@ -4,7 +4,13 @@ use std::{
     future::Future,
     io,
     net::SocketAddr as StdSocketAddr,
-    os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd},
+    os::{
+        fd::AsFd,
+        unix::{
+            io::{AsRawFd, FromRawFd, IntoRawFd, RawFd},
+            prelude::BorrowedFd,
+        },
+    },
     pin::Pin,
     sync::{
         atomic::{AtomicBool, AtomicU32, Ordering},
@@ -734,6 +740,12 @@ impl TcpSocket {
     }
 }
 
+impl AsFd for TcpSocket {
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        self.fd.as_fd()
+    }
+}
+
 impl AsRawFd for TcpSocket {
     fn as_raw_fd(&self) -> RawFd {
         self.fd.as_raw_fd()
@@ -753,6 +765,12 @@ impl FromRawFd for TcpSocket {
 impl IntoRawFd for TcpSocket {
     fn into_raw_fd(self) -> RawFd {
         self.fd.release()
+    }
+}
+
+impl AsFd for TcpStream {
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        unimplemented!("as_fd not supported in simulator")
     }
 }
 
