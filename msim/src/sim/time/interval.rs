@@ -171,6 +171,13 @@ impl Interval {
         self.delay.as_mut().reset(Instant::now() + self.period);
     }
 
+    /// Resets the interval after the specified [`std::time::Duration`]
+    ///
+    /// This method ignores [`MissedTickBehavior`] strategy.
+    pub fn reset_after(&mut self, after: Duration) {
+        self.delay.as_mut().reset(Instant::now() + after);
+    }
+
     /// Returns the [`MissedTickBehavior`] strategy currently being used.
     pub fn missed_tick_behavior(&self) -> MissedTickBehavior {
         self.missed_tick_behavior
