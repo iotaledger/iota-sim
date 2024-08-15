@@ -770,6 +770,12 @@ impl TcpSocket {
     }
 }
 
+impl AsFd for TcpSocket {
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        self.fd.as_fd()
+    }
+}
+
 impl AsRawFd for TcpSocket {
     fn as_raw_fd(&self) -> RawFd {
         self.fd.as_raw_fd()
