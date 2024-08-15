@@ -457,8 +457,8 @@ impl NodeHandle {
     /// Spawn a future onto the runtime.
     pub fn spawn<F>(&self, future: F) -> JoinHandle<F::Output>
     where
-        F: Future + Send + 'static,
-        F::Output: Send + 'static,
+        F: Future + 'static,
+        F::Output: 'static,
     {
         self.task.spawn(future)
     }
