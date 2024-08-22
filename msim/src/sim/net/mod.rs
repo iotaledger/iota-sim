@@ -36,11 +36,14 @@
 //! ```
 
 use std::{
-    collections::{hash_map::Entry, HashMap, HashSet},
+    collections::{HashMap, HashSet},
     io,
     net::{IpAddr, Ipv4Addr, SocketAddr, ToSocketAddrs},
     os::unix::io::{AsFd, AsRawFd, BorrowedFd, RawFd},
-    sync::{Arc, Mutex},
+    sync::{
+        atomic::{AtomicU32, Ordering},
+        Arc, Mutex,
+    },
     task::Context,
 };
 use tap::TapFallible;
@@ -70,7 +73,7 @@ pub struct NetSim {
     host_state: Mutex<HostNetworkState>,
     rand: GlobalRng,
     time: TimeHandle,
-    next_tcp_id_map: Mutex<HashMap<IpAddr, u32>>,
+    next_tcp_id: AtomicU32, // We always allocate new globally unique tcp id.
 }
 
 #[derive(Debug)]
@@ -895,7 +898,8 @@ impl plugin::Simulator for NetSim {
             rand: rand.clone(),
             time: time.clone(),
             host_state: Default::default(),
-            next_tcp_id_map: Mutex::new(HashMap::new()),
+            // tcp ids start at 1, 0 is used for new connections (see poll_accept_internal)
+            next_tcp_id: AtomicU32::new(1),
         }
     }
 
@@ -943,7 +947,7 @@ impl NetSim {
         let mut host_state = self.host_state.lock().unwrap();
         host_state.delete_node(id);
 
-        // We do not reset self.next_tcp_id_map - we do not want to re-use tcp ids after a node is
+        // We do not reset self.next_tcp_id - we do not want to re-use tcp ids after a node is
         // restarted.
     }
 
@@ -990,22 +994,9 @@ impl NetSim {
         self.time.sleep(delay).await;
     }
 
-    /// Get the next unused tcp id for this ip address.
-    pub fn next_tcp_id(&self, ip: IpAddr) -> u32 {
-        let mut map = self.next_tcp_id_map.lock().unwrap();
-        match map.entry(ip) {
-            Entry::Occupied(mut cur) => {
-                let cur = cur.get_mut();
-                // limited to 2^32 - 1 tcp sessions per ip per simulation run.
-                *cur = cur.checked_add(1).unwrap();
-                *cur
-            }
-            Entry::Vacant(e) => {
-                // tcp ids start at 1, 0 is used for new connections (see poll_accept_internal)
-                e.insert(1);
-                1
-            }
-        }
+    /// Get the next unused tcp id.
+    pub fn next_tcp_id(&self) -> u32 {
+        self.next_tcp_id.fetch_add(1, Ordering::SeqCst)
     }
 }
 
@@ -1106,7 +1097,13 @@ impl Endpoint {
 
     /// Allocate a new tcp id number for this node. Ids are never reused.
     pub fn allocate_local_tcp_id(&self) -> u32 {
-        let id = self.net.next_tcp_id(self.addr.ip());
+        let id = self.net.next_tcp_id();
+        trace!(
+            "Allocate local tcp id {} to node {} address {}",
+            id,
+            self.node,
+            self.addr.ip()
+        );
         self.live_tcp_ids.lock().unwrap().insert(id);
         self.net
             .network
