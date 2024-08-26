@@ -55,7 +55,7 @@ impl std::fmt::Debug for TcpListener {
 impl TcpListener {
     /// Bind to the given address.
     pub async fn bind<A: ToSocketAddrs>(addr: A) -> io::Result<Self> {
-        let addrs = addr.to_socket_addrs()?;
+        let addrs = addr.to_socket_addrs()?.collect::<Vec<_>>();
 
         let mut last_err = None;
 
