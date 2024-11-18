@@ -36,8 +36,8 @@ ahash = "0.8"
 downcast-rs = "1.2"
 libc = "0.2"
 naive-timer = "0.2"
-tokio = { git = "ssh://git@github.com/iotaledger/tokio-madsim-fork.git", branch = "main", package = "real_tokio", features = ["full"] }
-tokio-util = { git = "ssh://git@github.com/iotaledger/tokio-madsim-fork.git", branch = "main", features = ["full"] }
+tokio = { git = "https://github.com/iotaledger/tokio-madsim-fork.git", branch = "main", package = "real_tokio", features = ["full"] }
+tokio-util = { git = "https://github.com/iotaledger/tokio-madsim-fork.git", branch = "main", features = ["full"] }
 toml = "0.8"
 socket2 = "0.5"
 erasable = "1.2"
@@ -46,7 +46,7 @@ async-task = "4.7"
 [dev-dependencies]
 criterion = "0.5"
 structopt = "0.3"
-tokio = { git = "ssh://git@github.com/iotaledger/tokio-madsim-fork.git", branch = "main", package = "real_tokio", features = ["full"] }
+tokio = { git = "https://github.com/iotaledger/tokio-madsim-fork.git", branch = "main", package = "real_tokio", features = ["full"] }
 
 [package.metadata.docs.rs]
 # all-features = true
