@@ -632,7 +632,7 @@ impl<T> JoinHandle<T> {
 
     /// Return an AbortHandle corresponding for the task.
     pub fn abort_handle(&self) -> AbortHandle {
-        let inner = ErasablePtr::erase(Box::new(self.inner.clone()));
+        let inner = ErasablePtr::erase(self.inner.clone());
         let id = self.id;
         AbortHandle { id, inner }
     }
