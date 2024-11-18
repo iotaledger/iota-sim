@@ -362,6 +362,12 @@ impl fmt::Debug for Builder {
 #[derive(Debug)]
 pub struct LocalSet;
 
+impl Default for LocalSet {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LocalSet {
     /// Returns a new local task set.
     pub fn new() -> LocalSet {

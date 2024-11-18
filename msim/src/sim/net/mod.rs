@@ -336,7 +336,7 @@ unsafe fn accept_impl(
             let endpoint = socket
                 .endpoint
                 .as_ref()
-                .ok_or_else(|| ((-1, libc::EINVAL)))?;
+                .ok_or((-1, libc::EINVAL))?;
 
             if endpoint.peer.is_some() {
                 // attempt to accept on a socket that is already connected.
@@ -740,7 +740,7 @@ define_sys_interceptor!(
         flags: libc::c_int,
     ) -> libc::c_int {
         HostNetworkState::with_socket(sockfd, |socket| {
-            let msgs = std::slice::from_raw_parts_mut(msgvec as *mut libc::mmsghdr, vlen as _);
+            let msgs = std::slice::from_raw_parts_mut(msgvec, vlen as _);
 
             for msg in msgs.iter_mut() {
                 let dst_addr = msg_hdr_to_socket(&msg.msg_hdr);
@@ -825,7 +825,7 @@ unsafe fn recv_impl(ep: &Endpoint, msg: *mut libc::msghdr) -> CResult<libc::ssiz
         msg.msg_flags |= libc::MSG_TRUNC;
     }
     std::ptr::copy_nonoverlapping(
-        payload.as_ptr() as *const u8,
+        payload.as_ptr(),
         iov.iov_base as *mut u8,
         copy_len,
     );
@@ -1536,8 +1536,7 @@ mod tests {
             // FIXME: ep1 should not receive messages from other node
             timeout(Duration::from_secs(1), ep1.recv_from(1, &mut []))
                 .await
-                .err()
-                .expect("localhost endpoint should not receive from other nodes");
+                .expect_err("localhost endpoint should not receive from other nodes");
             // ep2 should receive
             ep2.recv_from(1, &mut []).await.unwrap();
         });

@@ -633,7 +633,7 @@ impl<T> JoinHandle<T> {
     /// Return an AbortHandle corresponding for the task.
     pub fn abort_handle(&self) -> AbortHandle {
         let inner = ErasablePtr::erase(Box::new(self.inner.clone()));
-        let id = self.id.clone();
+        let id = self.id;
         AbortHandle { id, inner }
     }
 }
@@ -648,11 +648,11 @@ impl<T> Future for JoinHandle<T> {
         let mut lock = self.inner.task.lock().unwrap();
         let task = lock.as_mut();
         if task.is_none() {
-            return std::task::Poll::Ready(Err(join_error::cancelled(self.id.clone())));
+            return std::task::Poll::Ready(Err(join_error::cancelled(self.id)));
         }
         std::pin::Pin::new(task.unwrap()).poll(cx).map(|res| {
             // TODO: decide cancelled or panic
-            res.ok_or(join_error::cancelled(self.id.clone()))
+            res.ok_or(join_error::cancelled(self.id))
         })
     }
 }
@@ -988,7 +988,7 @@ mod tests {
             time::sleep(Duration::from_secs(1)).await;
             join_set.detach_all();
             time::sleep(Duration::from_secs(5)).await;
-            assert_eq!(flag.load(Ordering::Relaxed), true);
+            assert!(flag.load(Ordering::Relaxed));
         });
     }
 }

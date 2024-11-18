@@ -31,7 +31,7 @@ impl<R> Poller<R> {
         let fut: &mut PollerPinFut<R> = poller.as_mut().unwrap();
         let res = fut.as_mut().poll(cx);
 
-        if let Poll::Ready(_) = res {
+        if res.is_ready() {
             poller.take();
         }
         res

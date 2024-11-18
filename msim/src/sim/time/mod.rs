@@ -570,7 +570,7 @@ mod tests {
             let std_t0 = std::time::Instant::now();
 
             // Verify that times in other threads are not intercepted.
-            let std_t1 = std::thread::spawn(|| std::time::Instant::now())
+            let std_t1 = std::thread::spawn(std::time::Instant::now)
                 .join()
                 .unwrap();
             assert_ne!(std_t0, std_t1);
