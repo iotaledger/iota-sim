@@ -333,10 +333,7 @@ unsafe fn accept_impl(
             let net = plugin::simulator::<NetSim>();
             let network = net.network.lock().unwrap();
 
-            let endpoint = socket
-                .endpoint
-                .as_ref()
-                .ok_or((-1, libc::EINVAL))?;
+            let endpoint = socket.endpoint.as_ref().ok_or((-1, libc::EINVAL))?;
 
             if endpoint.peer.is_some() {
                 // attempt to accept on a socket that is already connected.
@@ -824,11 +821,7 @@ unsafe fn recv_impl(ep: &Endpoint, msg: *mut libc::msghdr) -> CResult<libc::ssiz
     if copy_len < payload.len() {
         msg.msg_flags |= libc::MSG_TRUNC;
     }
-    std::ptr::copy_nonoverlapping(
-        payload.as_ptr(),
-        iov.iov_base as *mut u8,
-        copy_len,
-    );
+    std::ptr::copy_nonoverlapping(payload.as_ptr(), iov.iov_base as *mut u8, copy_len);
 
     // TODO: create control messages (e.g. original destination addr)
     msg.msg_control = std::ptr::null_mut();
