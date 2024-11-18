@@ -73,7 +73,9 @@ struct PanicWrapper {
     restart_after: Option<Duration>,
 }
 
-struct PanicHookGuard(Option<Box<dyn Fn(&std::panic::PanicInfo<'_>) + Sync + Send + 'static>>);
+type PanicFn = Box<dyn Fn(&std::panic::PanicInfo<'_>) + Sync + Send + 'static>;
+
+struct PanicHookGuard(Option<PanicFn>);
 
 impl PanicHookGuard {
     fn new() -> Self {
@@ -337,11 +339,13 @@ pub(crate) struct TaskHandle {
 }
 assert_send_sync!(TaskHandle);
 
+pub(crate) type InitFn = Arc<dyn Fn(&TaskNodeHandle) + Send + Sync>;
+
 struct Node {
     info: Arc<TaskInfo>,
     paused: Vec<Runnable>,
     /// A function to spawn the initial task.
-    init: Option<Arc<dyn Fn(&TaskNodeHandle) + Send + Sync>>,
+    init: Option<InitFn>,
 }
 
 impl TaskHandle {
@@ -392,11 +396,7 @@ impl TaskHandle {
     }
 
     /// Create a new node.
-    pub fn create_node(
-        &self,
-        name: Option<String>,
-        init: Option<Arc<dyn Fn(&TaskNodeHandle) + Send + Sync>>,
-    ) -> TaskNodeHandle {
+    pub fn create_node(&self, name: Option<String>, init: Option<InitFn>) -> TaskNodeHandle {
         let id = NodeId(self.next_node_id.fetch_add(1, Ordering::SeqCst));
         let name = name.unwrap_or_else(|| format!("node-{}", id.0));
         let info = Arc::new(TaskInfo::new(id, name));
@@ -690,7 +690,7 @@ impl AbortHandle {
         ret
     }
 
-    fn inner(&self) -> Box<Arc<InnerHandle<()>>> {
+    fn inner(&self) -> Arc<InnerHandle<()>> {
         unsafe { ErasablePtr::unerase(self.inner) }
     }
 }

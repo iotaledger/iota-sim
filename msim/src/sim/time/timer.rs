@@ -113,7 +113,7 @@ impl Eq for Event {}
 // BinaryHeap is a max-heap. So we need to reverse the order.
 impl PartialOrd for Event {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        other.deadline.partial_cmp(&self.deadline)
+        Some(self.cmp(other))
     }
 }
 

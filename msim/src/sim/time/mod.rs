@@ -543,6 +543,7 @@ define_sys_interceptor!(
             // used by Instant
             libc::CLOCK_MONOTONIC | libc::CLOCK_MONOTONIC_RAW | libc::CLOCK_MONOTONIC_COARSE => {
                 // Instant is the same layout as timespec on linux
+                #[allow(clippy::missing_transmute_annotations)]
                 ts.write(std::mem::transmute(time.now_instant()));
             }
 
