@@ -3,7 +3,7 @@
 //! # Examples
 //!
 //! ```
-//! use msim::{runtime::Runtime, net::Endpoint};
+//! use msim::{runtime::Runtime, net::{Endpoint, network::Payload}};
 //! use std::sync::Arc;
 //! use std::net::SocketAddr;
 //!
@@ -16,14 +16,14 @@
 //! let barrier_ = barrier.clone();
 //!
 //! node1.spawn(async move {
-//!     let net = Endpoint::bind(addr1).await.unwrap();
+//!     let net = Endpoint::bind(libc::SOCK_STREAM, addr1).await.unwrap();
 //!     barrier_.wait().await;  // make sure addr2 has bound
 //!
-//!     net.send_to(addr2, 1, &[1]).await.unwrap();
+//!     net.send_to(addr2, 1, Payload::new_udp(Box::new(vec![1u8]))).await.unwrap();
 //! });
 //!
 //! let f = node2.spawn(async move {
-//!     let net = Endpoint::bind(addr2).await.unwrap();
+//!     let net = Endpoint::bind(libc::SOCK_STREAM, addr2).await.unwrap();
 //!     barrier.wait().await;
 //!
 //!     let mut buf = vec![0; 0x10];
@@ -1140,11 +1140,11 @@ impl Endpoint {
     ///
     /// # Example
     /// ```
-    /// use msim::{runtime::Runtime, net::Endpoint};
+    /// use msim::{runtime::Runtime, net::{Endpoint, network::Payload}};
     ///
     /// Runtime::new().block_on(async {
-    ///     let net = Endpoint::bind("127.0.0.1:0").await.unwrap();
-    ///     net.send_to("127.0.0.1:4242", 0, &[0; 10]).await.expect("couldn't send data");
+    ///     let net = Endpoint::bind(libc::SOCK_STREAM, "127.0.0.1:4242").await.unwrap();
+    ///     net.send_to("127.0.0.1:4242", 0, Payload::new_udp(Box::new([0; 10]))).await.expect("couldn't send data");
     /// });
     /// ```
     pub async fn send_to(
@@ -1165,7 +1165,7 @@ impl Endpoint {
     /// use msim::{runtime::Runtime, net::Endpoint};
     ///
     /// Runtime::new().block_on(async {
-    ///     let net = Endpoint::bind("127.0.0.1:0").await.unwrap();
+    ///     let net = Endpoint::bind(libc::SOCK_STREAM, "127.0.0.1:0").await.unwrap();
     ///     let mut buf = [0; 10];
     ///     let (len, src) = net.recv_from(0, &mut buf).await.expect("couldn't receive data");
     /// });
