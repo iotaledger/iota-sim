@@ -483,7 +483,8 @@ impl NodeHandle {
 
     /// Join the node.
     /// TODO: unimplemented
-    #[expect(clippy::result_unit_err)]
+    // TODO: add this line after upgrading to toolchain 1.81
+    //#[expect(clippy::result_unit_err)]
     pub fn join(self) -> Result<(), ()> {
         warn!("TODO: implement NodeHandle::join()");
         Ok(())
