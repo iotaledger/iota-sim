@@ -44,7 +44,7 @@ erasable = "1.2"
 async-task = "4.7"
 
 [dev-dependencies]
-anyhow = "1.0.71"
+anyhow = "1.0"
 criterion = "0.5"
 structopt = "0.3"
 tokio = { git = "https://github.com/iotaledger/tokio-madsim-fork.git", branch = "main", package = "real_tokio", features = ["full"] }
