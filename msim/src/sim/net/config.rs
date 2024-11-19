@@ -110,7 +110,7 @@ impl InterNodeLatency for InterNodeLatencyMap {
             return Some(dist.sample(rng));
         }
 
-        return None;
+        None
     }
 }
 

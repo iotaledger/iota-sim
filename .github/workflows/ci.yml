@@ -22,7 +22,7 @@ jobs:
       - name: Clippy sim
         run: cargo clippy -- -D warnings
         env:
-          RUSTFLAGS: "--cfg madsim"
+          RUSTFLAGS: "--cfg msim"
 
   build:
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
       - name: Build sim
         run: cargo build
         env:
-          RUSTFLAGS: "--cfg madsim"
+          RUSTFLAGS: "--cfg msim"
 
   test:
     runs-on: ubuntu-latest
@@ -46,8 +46,8 @@ jobs:
       - name: Test sim
         run: cargo test --release --no-fail-fast
         env:
-          RUSTFLAGS: "--cfg madsim"
-          RUSTDOCFLAGS: "--cfg madsim"
+          RUSTFLAGS: "--cfg msim"
+          RUSTDOCFLAGS: "--cfg msim"
 
   bench:
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
       - name: Bench
         run: cargo bench -p msim
         env:
-          RUSTFLAGS: "--cfg madsim"
+          RUSTFLAGS: "--cfg msim"
 
   doc:
     runs-on: ubuntu-latest
@@ -67,5 +67,5 @@ jobs:
       - name: Doc
         run: cargo doc --no-deps
         env:
-          RUSTFLAGS: "--cfg madsim"
-          RUSTDOCFLAGS: "--cfg madsim --cfg docsrs"
+          RUSTFLAGS: "--cfg msim"
+          RUSTDOCFLAGS: "--cfg msim --cfg docsrs"

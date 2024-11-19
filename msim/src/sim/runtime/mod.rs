@@ -4,7 +4,7 @@ use super::*;
 use crate::assert_send_sync;
 use crate::context::TaskEnterGuard;
 use crate::net::NetSim;
-use crate::task::{JoinHandle, NodeId};
+use crate::task::{InitFn, JoinHandle, NodeId};
 use ::rand::Rng;
 use std::{
     any::TypeId,
@@ -372,7 +372,7 @@ pub struct NodeBuilder<'a> {
     handle: &'a Handle,
     name: Option<String>,
     ip: Option<IpAddr>,
-    init: Option<Arc<dyn Fn(&task::TaskNodeHandle) + Send + Sync>>,
+    init: Option<InitFn>,
 }
 
 impl<'a> NodeBuilder<'a> {
@@ -483,6 +483,7 @@ impl NodeHandle {
 
     /// Join the node.
     /// TODO: unimplemented
+    #[expect(clippy::result_unit_err)]
     pub fn join(self) -> Result<(), ()> {
         warn!("TODO: implement NodeHandle::join()");
         Ok(())
