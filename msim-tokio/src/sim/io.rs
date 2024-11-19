@@ -160,7 +160,7 @@ pub mod unix {
                 _ => unimplemented!("unhandled interested {:?}", interest),
             }
 
-            Ok(AsyncFdReadyMutGuard { async_fd: self }).into()
+            Ok(AsyncFdReadyMutGuard { async_fd: self })
         }
 
         #[allow(clippy::needless_lifetimes)] // The lifetime improves rustdoc rendering.

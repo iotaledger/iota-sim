@@ -493,7 +493,7 @@ impl TcpStream {
     }
 
     pub async fn peek(&self, buf: &mut [u8]) -> io::Result<usize> {
-        if buf.len() == 0 {
+        if buf.is_empty() {
             return Ok(0);
         }
 

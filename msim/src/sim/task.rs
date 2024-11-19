@@ -73,7 +73,9 @@ struct PanicWrapper {
     restart_after: Option<Duration>,
 }
 
-struct PanicHookGuard(Option<Box<dyn Fn(&std::panic::PanicInfo<'_>) + Sync + Send + 'static>>);
+type PanicFn = Box<dyn Fn(&std::panic::PanicInfo<'_>) + Sync + Send + 'static>;
+
+struct PanicHookGuard(Option<PanicFn>);
 
 impl PanicHookGuard {
     fn new() -> Self {
@@ -337,11 +339,13 @@ pub(crate) struct TaskHandle {
 }
 assert_send_sync!(TaskHandle);
 
+pub(crate) type InitFn = Arc<dyn Fn(&TaskNodeHandle) + Send + Sync>;
+
 struct Node {
     info: Arc<TaskInfo>,
     paused: Vec<Runnable>,
     /// A function to spawn the initial task.
-    init: Option<Arc<dyn Fn(&TaskNodeHandle) + Send + Sync>>,
+    init: Option<InitFn>,
 }
 
 impl TaskHandle {
@@ -392,11 +396,7 @@ impl TaskHandle {
     }
 
     /// Create a new node.
-    pub fn create_node(
-        &self,
-        name: Option<String>,
-        init: Option<Arc<dyn Fn(&TaskNodeHandle) + Send + Sync>>,
-    ) -> TaskNodeHandle {
+    pub fn create_node(&self, name: Option<String>, init: Option<InitFn>) -> TaskNodeHandle {
         let id = NodeId(self.next_node_id.fetch_add(1, Ordering::SeqCst));
         let name = name.unwrap_or_else(|| format!("node-{}", id.0));
         let info = Arc::new(TaskInfo::new(id, name));
@@ -632,8 +632,8 @@ impl<T> JoinHandle<T> {
 
     /// Return an AbortHandle corresponding for the task.
     pub fn abort_handle(&self) -> AbortHandle {
-        let inner = ErasablePtr::erase(Box::new(self.inner.clone()));
-        let id = self.id.clone();
+        let inner = ErasablePtr::erase(self.inner.clone());
+        let id = self.id;
         AbortHandle { id, inner }
     }
 }
@@ -648,11 +648,11 @@ impl<T> Future for JoinHandle<T> {
         let mut lock = self.inner.task.lock().unwrap();
         let task = lock.as_mut();
         if task.is_none() {
-            return std::task::Poll::Ready(Err(join_error::cancelled(self.id.clone())));
+            return std::task::Poll::Ready(Err(join_error::cancelled(self.id)));
         }
         std::pin::Pin::new(task.unwrap()).poll(cx).map(|res| {
             // TODO: decide cancelled or panic
-            res.ok_or(join_error::cancelled(self.id.clone()))
+            res.ok_or(join_error::cancelled(self.id))
         })
     }
 }
@@ -690,7 +690,7 @@ impl AbortHandle {
         ret
     }
 
-    fn inner(&self) -> Box<Arc<InnerHandle<()>>> {
+    fn inner(&self) -> Arc<InnerHandle<()>> {
         unsafe { ErasablePtr::unerase(self.inner) }
     }
 }
@@ -988,7 +988,7 @@ mod tests {
             time::sleep(Duration::from_secs(1)).await;
             join_set.detach_all();
             time::sleep(Duration::from_secs(5)).await;
-            assert_eq!(flag.load(Ordering::Relaxed), true);
+            assert!(flag.load(Ordering::Relaxed));
         });
     }
 }

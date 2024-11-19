@@ -202,7 +202,7 @@ impl<'a, T, S> IntoIterator for &'a HashSet<T, S> {
     type Item = &'a T;
     type IntoIter = hash_set::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        (&self.0).iter()
+        self.0.iter()
     }
 }
 
@@ -359,7 +359,7 @@ impl<'a, K, V, S> IntoIterator for &'a HashMap<K, V, S> {
     type Item = (&'a K, &'a V);
     type IntoIter = hash_map::Iter<'a, K, V>;
     fn into_iter(self) -> Self::IntoIter {
-        (&self.0).iter()
+        self.0.iter()
     }
 }
 
@@ -367,7 +367,7 @@ impl<'a, K, V, S> IntoIterator for &'a mut HashMap<K, V, S> {
     type Item = (&'a K, &'a mut V);
     type IntoIter = hash_map::IterMut<'a, K, V>;
     fn into_iter(self) -> Self::IntoIter {
-        (&mut self.0).iter_mut()
+        self.0.iter_mut()
     }
 }
 

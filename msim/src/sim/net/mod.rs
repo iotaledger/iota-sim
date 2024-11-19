@@ -3,7 +3,7 @@
 //! # Examples
 //!
 //! ```
-//! use msim::{runtime::Runtime, net::Endpoint};
+//! use msim::{runtime::Runtime, net::{Endpoint, network::Payload}};
 //! use std::sync::Arc;
 //! use std::net::SocketAddr;
 //!
@@ -16,14 +16,14 @@
 //! let barrier_ = barrier.clone();
 //!
 //! node1.spawn(async move {
-//!     let net = Endpoint::bind(addr1).await.unwrap();
+//!     let net = Endpoint::bind(libc::SOCK_STREAM, addr1).await.unwrap();
 //!     barrier_.wait().await;  // make sure addr2 has bound
 //!
-//!     net.send_to(addr2, 1, &[1]).await.unwrap();
+//!     net.send_to(addr2, 1, Payload::new_udp(Box::new(vec![1u8]))).await.unwrap();
 //! });
 //!
 //! let f = node2.spawn(async move {
-//!     let net = Endpoint::bind(addr2).await.unwrap();
+//!     let net = Endpoint::bind(libc::SOCK_STREAM, addr2).await.unwrap();
 //!     barrier.wait().await;
 //!
 //!     let mut buf = vec![0; 0x10];
@@ -333,10 +333,7 @@ unsafe fn accept_impl(
             let net = plugin::simulator::<NetSim>();
             let network = net.network.lock().unwrap();
 
-            let endpoint = socket
-                .endpoint
-                .as_ref()
-                .ok_or_else(|| ((-1, libc::EINVAL)))?;
+            let endpoint = socket.endpoint.as_ref().ok_or((-1, libc::EINVAL))?;
 
             if endpoint.peer.is_some() {
                 // attempt to accept on a socket that is already connected.
@@ -740,7 +737,7 @@ define_sys_interceptor!(
         flags: libc::c_int,
     ) -> libc::c_int {
         HostNetworkState::with_socket(sockfd, |socket| {
-            let msgs = std::slice::from_raw_parts_mut(msgvec as *mut libc::mmsghdr, vlen as _);
+            let msgs = std::slice::from_raw_parts_mut(msgvec, vlen as _);
 
             for msg in msgs.iter_mut() {
                 let dst_addr = msg_hdr_to_socket(&msg.msg_hdr);
@@ -824,11 +821,7 @@ unsafe fn recv_impl(ep: &Endpoint, msg: *mut libc::msghdr) -> CResult<libc::ssiz
     if copy_len < payload.len() {
         msg.msg_flags |= libc::MSG_TRUNC;
     }
-    std::ptr::copy_nonoverlapping(
-        payload.as_ptr() as *const u8,
-        iov.iov_base as *mut u8,
-        copy_len,
-    );
+    std::ptr::copy_nonoverlapping(payload.as_ptr(), iov.iov_base as *mut u8, copy_len);
 
     // TODO: create control messages (e.g. original destination addr)
     msg.msg_control = std::ptr::null_mut();
@@ -1147,11 +1140,11 @@ impl Endpoint {
     ///
     /// # Example
     /// ```
-    /// use msim::{runtime::Runtime, net::Endpoint};
+    /// use msim::{runtime::Runtime, net::{Endpoint, network::Payload}};
     ///
     /// Runtime::new().block_on(async {
-    ///     let net = Endpoint::bind("127.0.0.1:0").await.unwrap();
-    ///     net.send_to("127.0.0.1:4242", 0, &[0; 10]).await.expect("couldn't send data");
+    ///     let net = Endpoint::bind(libc::SOCK_STREAM, "127.0.0.1:4242").await.unwrap();
+    ///     net.send_to("127.0.0.1:4242", 0, Payload::new_udp(Box::new([0; 10]))).await.expect("couldn't send data");
     /// });
     /// ```
     pub async fn send_to(
@@ -1172,7 +1165,7 @@ impl Endpoint {
     /// use msim::{runtime::Runtime, net::Endpoint};
     ///
     /// Runtime::new().block_on(async {
-    ///     let net = Endpoint::bind("127.0.0.1:0").await.unwrap();
+    ///     let net = Endpoint::bind(libc::SOCK_STREAM, "127.0.0.1:0").await.unwrap();
     ///     let mut buf = [0; 10];
     ///     let (len, src) = net.recv_from(0, &mut buf).await.expect("couldn't receive data");
     /// });
@@ -1536,8 +1529,7 @@ mod tests {
             // FIXME: ep1 should not receive messages from other node
             timeout(Duration::from_secs(1), ep1.recv_from(1, &mut []))
                 .await
-                .err()
-                .expect("localhost endpoint should not receive from other nodes");
+                .expect_err("localhost endpoint should not receive from other nodes");
             // ep2 should receive
             ep2.recv_from(1, &mut []).await.unwrap();
         });

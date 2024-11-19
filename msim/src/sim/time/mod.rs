@@ -543,6 +543,7 @@ define_sys_interceptor!(
             // used by Instant
             libc::CLOCK_MONOTONIC | libc::CLOCK_MONOTONIC_RAW | libc::CLOCK_MONOTONIC_COARSE => {
                 // Instant is the same layout as timespec on linux
+                #[allow(clippy::missing_transmute_annotations)]
                 ts.write(std::mem::transmute(time.now_instant()));
             }
 
@@ -570,9 +571,7 @@ mod tests {
             let std_t0 = std::time::Instant::now();
 
             // Verify that times in other threads are not intercepted.
-            let std_t1 = std::thread::spawn(|| std::time::Instant::now())
-                .join()
-                .unwrap();
+            let std_t1 = std::thread::spawn(std::time::Instant::now).join().unwrap();
             assert_ne!(std_t0, std_t1);
 
             sleep(Duration::from_secs(1)).await;

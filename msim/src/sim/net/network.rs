@@ -533,24 +533,15 @@ impl Payload {
     }
 
     pub fn is_udp(&self) -> bool {
-        match self.ty {
-            PayloadType::Udp => true,
-            _ => false,
-        }
+        matches!(self.ty, PayloadType::Udp)
     }
 
     pub fn is_tcp_data(&self) -> bool {
-        match self.ty {
-            PayloadType::TcpData => true,
-            _ => false,
-        }
+        matches!(self.ty, PayloadType::TcpData)
     }
 
     pub fn is_tcp_connect(&self) -> bool {
-        match self.ty {
-            PayloadType::TcpSignalConnect => true,
-            _ => false,
-        }
+        matches!(self.ty, PayloadType::TcpSignalConnect)
     }
 }
 

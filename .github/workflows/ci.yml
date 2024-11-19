@@ -30,7 +30,7 @@ jobs:
       - name: Clippy sim
         uses: actions-rs/cargo@v1
         env:
-          RUSTFLAGS: "--cfg madsim"
+          RUSTFLAGS: "--cfg msim"
         with:
           command: clippy
           args: -- -D warnings
@@ -50,7 +50,7 @@ jobs:
       - name: Build sim
         uses: actions-rs/cargo@v1
         env:
-          RUSTFLAGS: "--cfg madsim"
+          RUSTFLAGS: "--cfg msim"
         with:
           command: build
 
@@ -70,8 +70,8 @@ jobs:
       - name: Test sim
         uses: actions-rs/cargo@v1
         env:
-          RUSTFLAGS: "--cfg madsim"
-          RUSTDOCFLAGS: "--cfg madsim"
+          RUSTFLAGS: "--cfg msim"
+          RUSTDOCFLAGS: "--cfg msim"
         with:
           command: test
           args: --release --no-fail-fast
@@ -88,7 +88,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: bench
-          args: -p madsim
+          args: -p msim
 
   doc:
     runs-on: ubuntu-latest
@@ -102,8 +102,8 @@ jobs:
       - name: Doc
         uses: actions-rs/cargo@v1
         env:
-          RUSTFLAGS: "--cfg madsim"
-          RUSTDOCFLAGS: "--cfg madsim --cfg docsrs"
+          RUSTFLAGS: "--cfg msim"
+          RUSTDOCFLAGS: "--cfg msim --cfg docsrs"
         with:
           command: doc
           args: --no-deps
