@@ -768,12 +768,6 @@ impl IntoRawFd for TcpSocket {
     }
 }
 
-impl AsFd for TcpStream {
-    fn as_fd(&self) -> BorrowedFd<'_> {
-        unimplemented!("as_fd not supported in simulator")
-    }
-}
-
 // To support conversion between TcpStream <-> RawFd we will need to lower the TcpState
 // and reading/writing operations to the net interceptor library - otherwise we can't track any
 // reads/writes that occur while the stream is being manipulated as a raw fd.
