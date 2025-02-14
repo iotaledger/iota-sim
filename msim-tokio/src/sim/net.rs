@@ -795,6 +795,12 @@ impl IntoRawFd for TcpStream {
     }
 }
 
+impl AsFd for TcpStream {
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        unimplemented!("as_fd not supported in simulator")
+    }
+}
+
 pub async fn lookup_host<T>(host: T) -> io::Result<impl Iterator<Item = StdSocketAddr>>
 where
     T: ToSocketAddrs,
