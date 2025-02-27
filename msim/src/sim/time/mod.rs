@@ -252,6 +252,12 @@ pub async fn advance(_duration: Duration) {
     unimplemented!("cannot advance clock in simulation - use sleep() instead");
 }
 
+/// Supply tokio::time::pause() API (for compilation only - this method is meaningless inside the
+/// simulator).
+pub fn pause() {
+    unimplemented!("cannot pause clock in simulation");
+}
+
 /// Require a `Future` to complete before the specified duration has elapsed.
 pub fn timeout<T: Future>(duration: Duration, future: T) -> Timeout<T> {
     let handle = TimeHandle::current();
