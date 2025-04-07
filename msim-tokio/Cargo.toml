@@ -1,6 +1,6 @@
 [package]
 name = "tokio"
-version = "1.43.0"
+version = "1.44.2"
 edition = "2021"
 authors = ["IOTA Stiftung"]
 description = "The `tokio` simulator on msim."
