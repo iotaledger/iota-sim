@@ -63,20 +63,17 @@ mod test {
     // output).
 
     #[sim_test(crate = "crate", config = "test_config()")]
-    async fn config_test() -> Result<(), anyhow::Error> {
-        println!("single {:08x}", rand::thread_rng().gen::<u32>());
-        Ok(())
+    async fn config_test() {
+        println!("single {:08x}", rand::thread_rng().r#gen::<u32>());
     }
 
     #[sim_test(crate = "crate", config = "test_config_multiple()")]
-    async fn config_test_multiple() -> Result<(), anyhow::Error> {
-        println!("multiple {:08x}", rand::thread_rng().gen::<u32>());
-        Ok(())
+    async fn config_test_multiple() {
+        println!("multiple {:08x}", rand::thread_rng().r#gen::<u32>());
     }
 
     #[sim_test(crate = "crate", config = "test_config_multiple_repeat()")]
-    async fn config_test_multiple_repeat() -> Result<(), anyhow::Error> {
-        println!("multiple repeat {:08x}", rand::thread_rng().gen::<u32>());
-        Ok(())
+    async fn config_test_multiple_repeat() {
+        println!("multiple repeat {:08x}", rand::thread_rng().r#gen::<u32>());
     }
 }

@@ -29,7 +29,9 @@ use std::{
 
 use tracing::{error_span, info, trace, Span};
 
+pub use tokio::msim_adapter::runtime_task::Id;
 pub use tokio::msim_adapter::{join_error, runtime_task};
+pub use tokio::task::coop;
 pub use tokio::task::{yield_now, JoinError};
 pub use tokio::{select, sync::watch};
 
@@ -82,8 +84,8 @@ impl PanicHookGuard {
         Self(Some(std::panic::take_hook()))
     }
 
-    fn call_hook(&self, info: &std::panic::PanicInfo<'_>) {
-        self.0.as_ref().unwrap()(info);
+    fn call_hook(&self, info: &std::panic::PanicHookInfo<'_>) {
+        (*self.0.as_ref().unwrap())(info);
     }
 }
 
@@ -609,11 +611,17 @@ impl<T> InnerHandle<T> {
 /// An owned permission to join on a task (await its termination).
 #[derive(Debug)]
 pub struct JoinHandle<T> {
-    id: runtime_task::Id,
+    id: Id,
     inner: Arc<InnerHandle<T>>,
 }
 
 impl<T> JoinHandle<T> {
+    /// Returns a task ID that uniquely identifies this task relative to other currently spawned
+    /// tasks.
+    pub fn id(&self) -> Id {
+        self.id
+    }
+
     /// Abort the task associated with the handle.
     pub fn abort(&self) {
         self.inner.abort();
@@ -667,7 +675,7 @@ impl<T> Drop for JoinHandle<T> {
 
 /// AbortHandle allows aborting, but not awaiting the return value.
 pub struct AbortHandle {
-    id: runtime_task::Id,
+    id: Id,
     inner: ErasedPtr,
 }
 

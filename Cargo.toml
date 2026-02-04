@@ -1,6 +1,5 @@
 [workspace]
 resolver = "2"
-
 members = [
     "msim",
     "msim-macros",
@@ -10,3 +9,8 @@ members = [
 exclude = [
     "test-crates/jsonrpsee-test",
 ]
+
+[workspace.lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(msim)',
+] }

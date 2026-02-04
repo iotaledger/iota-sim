@@ -1,6 +1,6 @@
 [package]
 name = "tokio"
-version = "1.46.1"
+version = "1.49.0"
 edition = "2021"
 authors = ["IOTA Stiftung"]
 description = "The `tokio` simulator on msim."
@@ -58,8 +58,13 @@ msim.path = "../msim"
 [dependencies]
 tracing = "0.1"
 
-real_tokio = { git = "https://github.com/iotaledger/tokio-madsim-fork.git", branch = "msim-1.43.0", package = "real_tokio", features = ["full"] }
+real_tokio = { git = "https://github.com/iotaledger/tokio-madsim-fork.git", branch = "msim-1.49.0", package = "real_tokio", features = ["full"] }
 bytes = { version = "1.7" }
 futures = { version = "0.3", features = ["async-await"] }
 mio = { version = "1.0" }
 libc = "0.2"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(msim)',
+] }
