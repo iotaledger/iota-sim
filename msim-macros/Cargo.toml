@@ -20,6 +20,4 @@ quote = "1"
 syn = "1"
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = [
-  'cfg(msim)',
-] }
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(msim)'] }

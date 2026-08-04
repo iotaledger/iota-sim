@@ -27,6 +27,4 @@ wasm-bindgen = [
 ]
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = [
-  'cfg(msim)',
-] }
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(msim)'] }
